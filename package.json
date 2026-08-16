@@ -1,0 +1,22 @@
+{
+  "name": "beaver",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "河狸 —— 被投进污染河谷的河狸，靠啃树筑坝让环境变好（第一刀：阳光河谷 + 点击刷木头）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "three": "0.182.0",
+    "box3d-wasm": "0.2.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.182.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.3.5"
+  }
+}
