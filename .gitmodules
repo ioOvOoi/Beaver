@@ -1,3 +1,3 @@
-[submodule "vendor/pgengine"]
-	path = vendor/pgengine
+[submodule "pgengine"]
+	path = pgengine
 	url = https://github.com/ioOvOoi/PGEngine.git
