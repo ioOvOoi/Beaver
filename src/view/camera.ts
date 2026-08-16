@@ -8,8 +8,8 @@
 import * as THREE from 'three/webgpu'
 import type { Snapshot } from '../../pgengine/src/sim/types'
 
-/** 肩后偏移：在狸背后（-z 方向是狸面朝方向）上方 */
-const OFFSET = new THREE.Vector3(0, 2.2, -3.5)
+/** 肩后偏移：狸面朝 -z（河谷方向），相机站狸背后（+z 侧）略高，越过狸肩看河谷 */
+const OFFSET = new THREE.Vector3(0, 2.4, 4)
 
 /**
  * 肩后相机：持有相机对象，每帧按狸位姿更新位置。

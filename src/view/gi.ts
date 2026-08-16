@@ -21,6 +21,15 @@ import { mrt, output, pass, screenUV, texture } from 'three/tsl'
 import { fxaa } from 'three/examples/jsm/tsl/display/FXAANode.js'
 import { EXRLoader, HDRLoader } from 'three/examples/jsm/Addons.js'
 
+// ------------------------------------------------------------------
+// webgiya 上游 import 顺序有讲究（不要重排！）：
+// surfelRadialDepth 与 surfelIntegratePass 互为循环依赖（上游源码设计）。
+// ESM 求值顺序取决于「谁先被 import」——必须先求值 surfelRadialDepth，
+// 它在依赖链里让 surfelIntegratePass 先完成，导出 consts 就绪；
+// 反过来先 import surfelIntegratePass 会触发 "Cannot access 'consts'
+// before initialization"（TDZ）。这就是 demo 在 vite 下能跑的原因。
+// ------------------------------------------------------------------
+import { applyOcclusionSettings } from 'webgiya/surfelRadialDepth'
 import { MAX_SURFELS } from 'webgiya/constants'
 import { createGBuffer } from 'webgiya/gbuffer'
 import { createSurfelPool } from 'webgiya/surfelPool'
@@ -34,7 +43,6 @@ import { createSceneBVH, type SceneBVHBundle } from 'webgiya/sceneBvh'
 import { createSurfelIntegratePass } from 'webgiya/surfelIntegratePass'
 import { createSurfelGIResolvePass } from 'webgiya/surfelGIResolvePass'
 import { createIntegratorDispatchArgs } from 'webgiya/integratorDispatchArgs'
-import { applyOcclusionSettings } from 'webgiya/surfelRadialDepth'
 
 /**
  * GI 管线的全部 GPU 状态。由 createGiPipeline 一次性装配，

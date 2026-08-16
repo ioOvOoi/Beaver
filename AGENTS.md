@@ -11,6 +11,8 @@ Never deliver incomplete code that cannot run without extra manual modification.
 Wrap complicated logic into independent helper‑functions to improve readability.
 每一小步进行一次中文git提交，详细描述更改以及任务。
 大模块更新需要创建分支进行修改。
+开发过程中优先写好debug。
+程序与美术分离。
 
 ## 每次先做
 

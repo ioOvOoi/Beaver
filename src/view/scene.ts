@@ -9,7 +9,12 @@
  */
 import * as THREE from 'three/webgpu'
 import { makeNodeStandard } from 'webgiya/materials'
-import { BEAVER_POSITION } from '../../pgengine/src/sim/world'
+
+/**
+ * 狸占位盒的世界位置 —— 游戏仓「独有」内容（CONTEXT-MAP：狸只活在游戏仓）。
+ * 与 main.ts 传给 createWorld 的 beaverPosition 保持一致。
+ */
+export const BEAVER_POSITION = { x: 0, y: 0.5, z: 3 } as const
 
 /** 河谷静物场景的产物：场景 + 唯一方向光（Surfel 恰好 1 个 DirectionalLight） */
 export interface StillLifeBundle {

@@ -17,6 +17,14 @@ export default defineConfig({
       webgiya: resolve(__dirname, 'pgengine/third_party/webgiya/src'),
     },
   },
+  optimizeDeps: {
+    // box3d-wasm 是 emscripten 产物，靠 import.meta.url 找同目录 .wasm；
+    // 预构建会把 wasm 路径打散导致 dev 下 404，排除掉让它走源文件
+    exclude: ['box3d-wasm', 'box3d-wasm/standard'],
+    // 只扫我们自己入口的依赖；否则 vite 会把 webgiya 的演示
+    // public/visualizations/*.html（引 lil-gui）也当入口扫描
+    entries: ['index.html'],
+  },
   server: {
     // 允许从子模块目录读源码（vite 默认限制在 workspace root 内，pgengine 在仓库里，无需放开；
     // 这里显式声明根目录即可）
