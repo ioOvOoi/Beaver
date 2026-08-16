@@ -155,7 +155,9 @@ export async function createGiPipeline(
   const renderFrame = (scene: THREE.Scene, cam: THREE.PerspectiveCamera) => {
     cam.updateMatrixWorld()
 
-    // 1) 离屏 GBuffer：为 surfel 生成提供法线/深度/漫反射
+    // 1) 离屏 GBuffer：为 surfel 生成提供法线/深度/漫反射。
+    // 与 webgiya demo 同款：先摘掉背景，避免 env 贴图这种「无限远」像素混进 surfel 生成
+    scene.background = null
     const prevTarget = renderer.getRenderTarget()
     renderer.setMRT(gbuffer.sceneMRT)
     renderer.setRenderTarget(gbuffer.target)
