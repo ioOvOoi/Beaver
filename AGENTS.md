@@ -1,6 +1,16 @@
 # AGENTS
 
-本仓是**河狸**游戏，不是引擎。引擎在根目录 `pgengine`。
+本仓是**河狸**游戏，引擎在根目录 `pgengine`。
+
+## 必须遵守
+
+Break your requirement down into small, test‑able functions before writing any code.
+Match the existing code‑style and architecture inside your current repository.
+Add defensive checks for edge‑case inputs and handle runtime exceptions gracefully.
+Never deliver incomplete code that cannot run without extra manual modification.
+Wrap complicated logic into independent helper‑functions to improve readability.
+每一小步进行一次中文git提交，详细描述更改以及任务。
+大模块更新需要创建分支进行修改。
 
 ## 每次先做
 
@@ -18,14 +28,16 @@
 
 不要改 `pgengine/third_party/` 里钉死的上游。不要在本仓再造一套 tick / 物理 / GI。
 
-## 第一关（现在只做这个）
+## Agent skills
 
-同时引用 Webgiya 和 Box3D：
+### Issue tracker
 
-- 引擎仓拉 `third_party/webgiya`，写进引擎 README 引用表
-- 刚体走 `box3d-wasm`，写进引擎 README 引用表
-- 两样都要能跑
-- 不要求 Surfel 焊到动态刚体上
-- 这一关不做联机、不做 Steam
+任务、地图、规格、票一律 GitHub Issues（`gh`）。禁止再写 `.scratch/` tracker。见 `docs/agents/issue-tracker.md`。
 
-完成：可演示一件事 + git diff。动了 sim 要有测试绿。
+### Triage labels
+
+`needs-triage` / `needs-info` / `ready-for-agent` / `ready-for-human` / `wontfix`。见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+多上下文：`CONTEXT-MAP.md` → `CONTEXT.md`（河狸）+ `pgengine/CONTEXT.md`。见 `docs/agents/domain.md`。
