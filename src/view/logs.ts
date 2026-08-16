@@ -8,7 +8,8 @@ import * as THREE from 'three/webgpu'
 import { makeNodeStandard } from 'webgiya/materials'
 import type { Snapshot } from '../../pgengine/src/sim/types'
 
-/** 木头组：挂在 scene 下，但 BVH 构建时会被临时移出（见 gi.ts） */
+/** 木头组：挂在 scene 下。装配顺序是「先建 BVH、后挂木头组」（见 view/index.ts 与 gi.ts
+ *  的 createSceneBVH 调用时机），所以动态木头从不进入静态 BVH —— 议题 #6 */
 export class LogMeshes {
   private readonly group = new THREE.Group()
   private readonly meshes = new Map<number, THREE.Mesh>()
@@ -20,7 +21,7 @@ export class LogMeshes {
   private static readonly logGeometry = new THREE.BoxGeometry(0.6, 0.6, 1.2)
 
   constructor() {
-    this.group.name = 'logs' // 动态物标记：BVH 构建时排除
+    this.group.name = 'logs' // 动态物组标记（供未来调试过滤）
   }
 
   /** 把木头组挂到场景（构建 BVH 之后再调用） */

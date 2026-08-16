@@ -27,6 +27,8 @@ interface ViewInternals extends GameView {
   /** 肩后相机：持有 THREE 相机对象 */
   cam: ShoulderCamera
   logs: LogMeshes
+  /** 狸占位盒（位置从 Snapshot 同步） */
+  beaver: THREE.Mesh
   gi: GiPipeline
 }
 
@@ -36,7 +38,7 @@ interface ViewInternals extends GameView {
  */
 export async function createView(mount: HTMLElement): Promise<GameView> {
   // 1) 河谷静物：平地、程序树、盒子狸、不透明静水（全部进 BVH）
-  const { scene, dirLight } = createStillLife()
+  const { scene, dirLight, beaver } = createStillLife()
 
   // 2) 肩后相机（先建，因为 GI 管线需要相机参数）
   const cam = new ShoulderCamera(window.innerWidth / window.innerHeight)
@@ -51,10 +53,15 @@ export async function createView(mount: HTMLElement): Promise<GameView> {
   logs.attachTo(scene)
 
   // 6) 点击 → 平地坐标（喂给 sim 的 SpawnLog）
+  // 先与 y=0 数学平面求交，再钳制到平地范围（GROUND_HALF-留边），
+  // 否决河谷外的点击 —— 不然木头会在平地外无限下坠、id 永涨
   const raycaster = new THREE.Raycaster()
   const ndc = new THREE.Vector2()
   const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0) // y=0 平面
   const hitPoint = new THREE.Vector3()
+  // 平地半径须与 sim 的 GROUND_HALF 一致；sim 未导出，先按 100 留 15m 边
+  const GROUND_HALF = 100
+  const EDGE = 15
 
   const screenToGround = (
     clientX: number,
@@ -66,16 +73,18 @@ export async function createView(mount: HTMLElement): Promise<GameView> {
       -((clientY - rect.top) / rect.height) * 2 + 1,
     )
     raycaster.setFromCamera(ndc, cam.camera)
-    if (raycaster.ray.intersectPlane(groundPlane, hitPoint)) {
-      return { x: hitPoint.x, y: 0, z: hitPoint.z }
-    }
-    return null // 射线没打到平地（理论上不会发生，防御）
+    if (!raycaster.ray.intersectPlane(groundPlane, hitPoint)) return null
+    // 钳制：点击落在平地边界内才生效（河谷外不刷木）
+    const limit = GROUND_HALF - EDGE
+    if (Math.abs(hitPoint.x) > limit || Math.abs(hitPoint.z) > limit) return null
+    return { x: hitPoint.x, y: 0, z: hitPoint.z }
   }
 
   const internals: ViewInternals = {
     scene,
     cam,
     logs,
+    beaver,
     gi,
     onClickGround: (cb) => {
       gi.renderer.domElement.addEventListener('pointerdown', (e) => {
@@ -101,6 +110,9 @@ export async function createView(mount: HTMLElement): Promise<GameView> {
 export function renderView(view: GameView, snap: Snapshot): void {
   const v = view as ViewInternals
   v.logs.sync(snap) // 木头位姿 ← Snapshot
+  // 狸占位盒 ← Snapshot（本刀狸静态，但保持「view 只吃 Snapshot」的单向纪律）
+  const b = snap.beaver.position
+  v.beaver.position.set(b.x, b.y, b.z)
   v.cam.follow(snap) // 肩后镜头 ← Snapshot 里狸的位姿
   v.gi.renderFrame(v.scene, v.cam.camera)
 }

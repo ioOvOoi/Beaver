@@ -5,7 +5,7 @@
  * 数据流严格单向：输入 → sim tick（固定步）→ Snapshot → view 绘制。
  * view 绝不直接改 World；木头只吃直接光，不进 BVH（议题 #6）。
  */
-import { createWorld, tick, snapshot, type SimWorld } from '../pgengine/src/sim/world'
+import { createWorld, tick, snapshot, FIXED_DT, type SimWorld } from '../pgengine/src/sim/world'
 import type { Input } from '../pgengine/src/sim/types'
 import { createView, renderView, disposeView, type GameView } from './view'
 import { BEAVER_POSITION } from './view/scene'
@@ -46,7 +46,7 @@ export async function startGame(mount: HTMLElement): Promise<Game> {
 
   // 固定步累加器：显示器 60/144Hz 都走同样的物理节奏（用户故事 20/21）
   // 卡顿时不追赶（steps 钳制），避免「死亡螺旋」
-  const FIXED_DT = 1 / 60
+  // 步长直接复用引擎的 FIXED_DT，不在这里重复写死，避免两处失步
   let accumulator = 0
   let lastTime = performance.now()
 

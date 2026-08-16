@@ -20,6 +20,8 @@ export const BEAVER_POSITION = { x: 0, y: 0.5, z: 3 } as const
 export interface StillLifeBundle {
   scene: THREE.Scene
   dirLight: THREE.DirectionalLight
+  /** 狸占位盒：位置由 view 层每帧从 Snapshot 同步（view 只吃 Snapshot） */
+  beaver: THREE.Mesh
 }
 
 /**
@@ -73,16 +75,18 @@ export function createStillLife(): StillLifeBundle {
     scene.add(makeTree(x, z, s))
   }
 
-  // ---- 盒子狸：本刀静态占位盒，站在 sim 给的狸位姿 ----
+  // ---- 盒子狸：静态占位盒。几何半高 0.5，与 sim 注入的 BEAVER_POSITION.y=0.5
+  //   同源（中心在 0.5 = 底贴地），画面与物理不再出现「差 0.1」的两套魔法数 ----
   const beaver = new THREE.Mesh(
-    new THREE.BoxGeometry(0.9, 1.2, 1.1),
+    new THREE.BoxGeometry(0.9, 1.0, 1.1),
     makeNodeStandard(0x8b5a2b, 0.7, 0), // 木棕色
   )
-  beaver.position.set(BEAVER_POSITION.x, 0.6, BEAVER_POSITION.z) // 底贴地：半高 0.6
+  // 初始就放到狸位姿；此后每帧由 renderView 按 Snapshot 同步
+  beaver.position.set(BEAVER_POSITION.x, BEAVER_POSITION.y, BEAVER_POSITION.z)
   beaver.castShadow = true
   scene.add(beaver)
 
-  return { scene, dirLight }
+  return { scene, dirLight, beaver }
 }
 
 /**

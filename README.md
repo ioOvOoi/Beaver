@@ -19,6 +19,9 @@
 需要支持 WebGPU 的浏览器（Chrome/Edge 114+）。
 
 ```bash
+# 首次 clone：引擎与 webgiya 都是子模块，必须递归拉取
+git submodule update --init --recursive
+
 # 游戏仓
 npm install
 npm run dev        # 打开终端提示的本地地址（Vite 默认 http://localhost:5173）
