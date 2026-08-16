@@ -13,6 +13,10 @@ export class LogMeshes {
   private readonly group = new THREE.Group()
   private readonly meshes = new Map<number, THREE.Mesh>()
 
+  // 木头材质/几何共享单例：所有木头同色同质感同尺寸，没必要每根 new 一份 GPU 资源
+  private static readonly logMaterial = makeNodeStandard(0x7a5230, 0.75, 0)
+  private static readonly logGeometry = new THREE.BoxGeometry(1, 1, 1)
+
   constructor() {
     this.group.name = 'logs' // 动态物标记：BVH 构建时排除
   }
@@ -30,11 +34,8 @@ export class LogMeshes {
       seen.add(log.id)
       let mesh = this.meshes.get(log.id)
       if (!mesh) {
-        // 新木头：1m 见方木棕盒子（与 sim 的 LOG_HALF=0.5 对应）
-        mesh = new THREE.Mesh(
-          new THREE.BoxGeometry(1, 1, 1),
-          makeNodeStandard(0x7a5230, 0.75, 0),
-        )
+        // 新木头：1m 见方木棕盒子（与 sim 的 LOG_HALF=0.5 对应）；几何也共享
+        mesh = new THREE.Mesh(LogMeshes.logGeometry, LogMeshes.logMaterial)
         mesh.castShadow = true
         mesh.receiveShadow = true
         this.meshes.set(log.id, mesh)
@@ -44,12 +45,13 @@ export class LogMeshes {
     }
 
     // 清理 sim 里已不存在的木头（第一刀不会发生，防御性处理）
-    for (const [id, mesh] of this.meshes) {
-      if (!seen.has(id)) {
-        this.group.remove(mesh)
-        mesh.geometry.dispose()
-        ;(mesh.material as THREE.Material).dispose()
-        this.meshes.delete(id)
+    if (this.meshes.size !== seen.size) {
+      for (const [id, mesh] of this.meshes) {
+        if (!seen.has(id)) {
+          this.group.remove(mesh)
+          // 共享材质/几何不在此 dispose（还有别的木头在用）
+          this.meshes.delete(id)
+        }
       }
     }
   }
